@@ -1,0 +1,2 @@
+;making a foriegn key
+;making a relationship in model of user and contacts
