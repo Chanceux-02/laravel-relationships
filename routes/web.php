@@ -1,8 +1,12 @@
 <?php
 
 use App\Models\Contacts;
+use App\Models\Motorcycle;
 use App\Models\User;
+use Faker\Factory;
+use Faker\Provider\Fakecar;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +22,27 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/user', function () {
+Route::get('/oneToOne', function () {
+
+    $faker = Factory::create();
+    $faker->addProvider(new Fakecar($faker));
+
+   $data = [
+        'uid' => fake()->randomDigitNot(0) ,
+        'brand' => $faker->vehicleBrand(),
+        'model' => $faker->vehicleModel(),
+   ];
+   $motorcycle = new Motorcycle;
+   $motorcycle->fill($data);
+   $motorcycle->save();
+
+   $user = User::find(8)->motorcycle;
+//    $user = Motorcycle::find(1)->users;
+   dd($user);
+   return view('oneToOne', compact('user'));
+});
+
+Route::get('/oneToMany', function () {
     $data = [
         'uid' => fake()->randomDigitNot(0) ,
         'contact_no' => fake()->phoneNumber (),
@@ -27,12 +51,21 @@ Route::get('/user', function () {
     ];
 
     $contact = new Contacts;
-    // $contact->fill($data);
-    // $contact->save();
+    $contact->fill($data);
+    $contact->save();
 
-    // $getAll = contacts::all();
+    $getAll = Contacts::all();
 
     $user = User::find(fake()->randomDigitNot(0));
-    $getAll = $user->Contacts;
+    $getAll = $user->contacts;
     return view('index', compact('getAll'));
 });
+
+Route::get('/belongsTo', function () {
+
+    $contact = Contacts::find(5);
+    $getAll = $contact->users;
+    dd($getAll);
+    return view('index', compact('getAll'));
+});
+
